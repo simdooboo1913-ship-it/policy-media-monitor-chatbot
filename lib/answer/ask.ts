@@ -7,6 +7,7 @@ import type { Policy } from "../db/policies";
 import type { LlmFn } from "./llm";
 import { relatePolicy, type PolicyLink } from "./policy";
 import { extractKeywords, findCandidates, matchCount, mentionsUnsupportedChannel } from "./search";
+import { findConflictNotices } from "./conflict";
 import { NO_SENTENCES_REASON, verifyAnswer, type AnswerSentence } from "./verify";
 
 export const NO_EVIDENCE_TEXT = "확인된 자료가 없습니다";
@@ -125,6 +126,8 @@ export async function askQuestion(input: {
         const ed = editionOf(a.publishedAt);
         return { n, title: a.title, url: a.url, publisher: a.publisher, publishedAt: a.publishedAt, edition: ed.edition, editionDate: ed.date };
       });
+      // 같은 주제인데 수치가 다른 출처가 있으면 합치지 않고 알린다.
+      notices.push(...findConflictNotices(used.map((n) => ({ n, article: candidates[n - 1] }))));
       // 국정과제 연관성: 같은 제한 시간 안에서 찾고, 못 찾으면 고정 문구로 표시한다. (답변 자체는 그대로 낸다)
       const relatedText = [question, ...sources.map((s) => s.title), ...verified.sentences.map((s) => s.text)].join("\n");
       const policy = input.policies

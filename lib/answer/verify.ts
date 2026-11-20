@@ -20,7 +20,7 @@ export const FORBIDDEN_EXPRESSIONS = [
   "것으로 보인다", "거짓", "허위", "사실이 아니", "사실로 확인", "잘못된",
 ];
 
-function numbersIn(text: string): string[] {
+export function numbersIn(text: string): string[] {
   return (text.replace(/(\d),(?=\d{3})/g, "$1").match(/\d+(?:\.\d+)?/g) ?? []);
 }
 
@@ -88,5 +88,15 @@ function checkSentence(item: unknown, candidates: Pick<Article, "title" | "summa
   const sourceNumbers = new Set(numbersIn(sourceText));
   if (numbersIn(text).some((x) => !sourceNumbers.has(x))) return "기사에 없는 숫자";
   if (hasLongVerbatimRun(text, sourceText)) return "기사 문장을 길게 그대로 옮김";
+  // 출처가 둘 이상인데 어떤 출처에는 문장의 숫자가 없고 그 출처가 다른 숫자를 말하고 있으면, 상충하는 내용을 한 문장으로 합친 것이다. (PRD: 합치지 않는다)
+  if (nums.length > 1) {
+    const sentenceNumbers = new Set(numbersIn(text));
+    for (const n of nums) {
+      const own = new Set(numbersIn(`${candidates[n - 1].title} ${candidates[n - 1].summary}`));
+      const missing = [...sentenceNumbers].some((x) => !own.has(x));
+      const different = [...own].some((x) => !sentenceNumbers.has(x));
+      if (missing && different) return "출처마다 수치가 달라 한 문장으로 합침";
+    }
+  }
   return { text, sources: nums };
 }

@@ -14,7 +14,7 @@ export const DUPLICATE_WINDOW_HOURS = 24;
 const WINDOW_MS = DUPLICATE_WINDOW_HOURS * 60 * 60 * 1000;
 
 /** 제목에서 한글·영문·숫자만 남기고 두 글자씩 끊어 센다. */
-function bigrams(title: string): Map<string, number> {
+export function bigrams(title: string): Map<string, number> {
   const letters = title.toLowerCase().replace(/[^가-힣a-z0-9]/g, "");
   const counts = new Map<string, number>();
   if (letters.length === 0) return counts;
