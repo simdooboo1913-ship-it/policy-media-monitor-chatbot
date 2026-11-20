@@ -148,3 +148,11 @@ export async function deleteExpiredArticles(keepDays = 7): Promise<number> {
   if (error) throwDbError("오래된 기사 삭제", error.message);
   return data?.length ?? 0;
 }
+
+/** 선택한 기사들을 id 로 가져온다. (엑셀로 보낼 기사 확인용) */
+export async function listArticlesByIds(ids: string[]): Promise<Article[]> {
+  if (ids.length === 0) return [];
+  const { data, error } = await getDb().from("articles").select("*").in("id", ids);
+  if (error) throwDbError("선택한 기사 조회", error.message);
+  return ((data ?? []) as ArticleRow[]).map(fromRow);
+}

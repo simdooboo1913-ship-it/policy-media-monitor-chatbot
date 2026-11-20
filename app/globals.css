@@ -24,3 +24,9 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
 }
+
+/* PDF로 저장(인쇄) 할 때 엑셀 양식처럼 A4 가로로 나오게 한다 */
+@page {
+  size: A4 landscape;
+  margin: 8mm;
+}

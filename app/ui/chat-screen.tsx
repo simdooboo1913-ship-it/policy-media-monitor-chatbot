@@ -1,6 +1,7 @@
 "use client";
 
 // Design Ref: §3.2 — 메인 화면: 부처 선택 → 답변 칸 → 안내 문구 → 질문 입력.
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import type { AskResult } from "@/lib/answer/ask";
@@ -109,8 +110,11 @@ export default function ChatScreen() {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 py-6">
-      <header>
+      <header className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-bold">정책·언론 모니터링 &amp; 이슈 브리핑 챗봇</h1>
+        <Link href="/dashboard" className="text-sm text-blue-600 underline">
+          대시보드 (기사 수집·엑셀) →
+        </Link>
       </header>
 
       <MinistrySelector selected={ministry} onSelect={handleSelect} />
