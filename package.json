@@ -6,12 +6,22 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "articles:organize": "tsx --env-file=.env scripts/organize-articles.ts",
+    "articles:collect": "tsx --env-file=.env scripts/collect-articles.ts",
+    "answers:check": "tsx --env-file=.env scripts/check-answers.ts",
+    "digest:preview": "tsx --env-file=.env scripts/preview-digest.ts",
+    "digest:send": "tsx --env-file=.env scripts/send-digest.ts",
+    "policies:import": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/import-policies.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.2",
+    "fast-xml-parser": "^5.12.1",
     "next": "16.4.6",
+    "pdf-parse": "^2.4.5",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "unpdf": "^2.2.1"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
@@ -20,7 +30,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "supabase": "^3.2.0",
     "tailwindcss": "4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }

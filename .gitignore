@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# 이름만 적은 견본 파일은 올려도 된다 (실제 값은 절대 넣지 않는다)
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +41,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 삭제 대기 폴더 (사용자가 직접 확인 후 삭제)
+/trash-can/
+
+# 아침 요약 미리보기 결과
+/digest-preview.html
+
+# 작업 기록 폴더(명령 이력 등)는 커밋하지 않는다. 미리보기 설정만 예외
+/.bkit/
+/.claude/*
+!/.claude/launch.json
