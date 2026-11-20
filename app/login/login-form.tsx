@@ -74,17 +74,17 @@ export default function LoginForm() {
         value={password}
         onChange={(event) => setPassword(event.target.value)}
         maxLength={200}
-        className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+        className="field w-full px-4 py-2.5 text-sm"
       />
       <button
         type="submit"
         disabled={password === "" || pending}
-        className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-zinc-300 dark:disabled:bg-zinc-700"
+        className="btn-pop w-full px-4 py-2.5 text-sm"
       >
-        {pending ? "확인 중..." : "들어가기"}
+        {pending ? "확인 중..." : "들어가기 🚪"}
       </button>
       {notice && (
-        <p role="alert" className="rounded-md bg-red-50 p-3 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
+        <p role="alert" className="rounded-xl bg-rose-500/20 p-3 text-sm text-rose-100">
           {notice.text}
         </p>
       )}

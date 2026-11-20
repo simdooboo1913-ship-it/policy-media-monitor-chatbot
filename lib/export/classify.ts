@@ -7,6 +7,7 @@ import type { Article } from "../db/articles";
 import type { Policy } from "../db/policies";
 import { mapLimit, summarize } from "../digest/build";
 import { MINISTRIES } from "../ministries";
+import { publisherName } from "./publisher";
 import { MAX_CELL_LENGTH, type SheetRow } from "./types";
 
 export const AGENDA_UNKNOWN_TEXT = "확인 불가";
@@ -48,7 +49,7 @@ export async function suggestTones(articles: Article[], llm: LlmFn, signal: Abor
 /** 비고: 제목에서 뽑은 키워드 (원문 링크는 주요내용 글자에 건다) */
 export function buildNote(article: Article): string {
   const keywords = extractKeywords(article.title, [...MINISTRIES], 3);
-  return keywords.length > 0 ? `키워드: ${keywords.join(", ")}` : "";
+  return keywords.join(", ");
 }
 
 export async function classifyArticles(input: {
@@ -88,7 +89,7 @@ export async function classifyArticles(input: {
         ? [
             {
               date: kstMonthDay(article.publishedAt),
-              publisher: article.publisher,
+              publisher: publisherName(article.publisher),
               ministry: article.ministry,
               content: (summaries.get(i) ?? article.title).slice(0, MAX_CELL_LENGTH),
               priorityPolicy: "",

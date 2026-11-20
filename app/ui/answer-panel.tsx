@@ -2,6 +2,8 @@
 // 부처 버튼을 누르면 질문 전에 그 부처의 최신 기사 목록을 먼저 보여준다. (AI 없이 보관함만 읽어 빠르다)
 import type { AskResult } from "@/lib/answer/ask";
 import type { PolicyLink } from "@/lib/answer/policy";
+import { publisherName } from "@/lib/export/publisher";
+import { MINISTRY_SHORT, type Ministry } from "@/lib/ministries";
 
 export type NewsItem = {
   title: string;
@@ -31,11 +33,11 @@ function formatTime(iso: string): string {
   return new Date(iso).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
-const muted = "text-zinc-500 dark:text-zinc-400";
-const errorBox = "rounded-md bg-red-50 p-3 text-red-900 dark:bg-red-950 dark:text-red-200";
+const muted = "text-violet-200/70";
+const errorBox = "rounded-xl bg-rose-500/20 p-3 text-rose-100";
 
 function NewsList({ items }: { items: NewsItem[] }) {
-  if (items.length === 0) return <p className="rounded-md bg-zinc-100 p-3 dark:bg-zinc-800">신규 동향 없음</p>;
+  if (items.length === 0) return <p className="rounded-xl bg-white/10 p-3">신규 동향 없음</p>;
   // 조간/석간(날짜 포함)별로 묶는다. 최신 신문이 위.
   const groups = new Map<string, { label: string; items: NewsItem[] }>();
   for (const item of [...items].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))) {
@@ -49,16 +51,16 @@ function NewsList({ items }: { items: NewsItem[] }) {
       {[...groups.entries()]
         .sort((a, b) => b[0].localeCompare(a[0]))
         .map(([key, g]) => (
-          <div key={key} className="rounded-md border border-zinc-200 p-3 dark:border-zinc-700">
+          <div key={key} className="rounded-xl border border-white/15 bg-white/5 p-3">
             <h3 className={`mb-2 text-xs font-semibold ${muted}`}>{g.label}</h3>
             <ul className="space-y-2">
               {g.items.map((item) => (
                 <li key={item.url}>
-                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline dark:text-blue-400">
+                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-cyan-300 underline decoration-cyan-300/50 hover:text-cyan-200">
                     {item.title}
                   </a>
                   <span className={`ml-1 text-xs ${muted}`}>
-                    · {item.publisher} · {formatTime(item.publishedAt)}
+                    · {publisherName(item.publisher)} · {formatTime(item.publishedAt)}
                     {item.duplicateCount > 1 ? ` · 같은 내용 ${item.duplicateCount}건` : ""}
                   </span>
                 </li>
@@ -86,13 +88,13 @@ function Answer({ result }: { result: AskResult }) {
   return (
     <div className="space-y-4">
       {ordered.map((group) => (
-        <div key={group.key} className="rounded-md border border-zinc-200 p-3 dark:border-zinc-700">
+        <div key={group.key} className="rounded-xl border border-white/15 bg-white/5 p-3">
           <h3 className={`mb-2 text-xs font-semibold ${muted}`}>{group.label}</h3>
           <ul className="space-y-2">
             {group.sentences.map((s, i) => (
               <li key={i}>
                 {s.text}{" "}
-                <span className="text-xs text-blue-600 dark:text-blue-400">{s.sources.map((n) => `[${n}]`).join("")}</span>
+                <span className="text-xs font-bold text-pink-300">{s.sources.map((n) => `[${n}]`).join("")}</span>
               </li>
             ))}
           </ul>
@@ -104,10 +106,10 @@ function Answer({ result }: { result: AskResult }) {
           {result.sources.map((s) => (
             <li key={s.n}>
               [{s.n}]{" "}
-              <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline dark:text-blue-400">
+              <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-cyan-300 underline decoration-cyan-300/50 hover:text-cyan-200">
                 {s.title}
               </a>{" "}
-              · {s.publisher} · {formatTime(s.publishedAt)}
+              · {publisherName(s.publisher)} · {formatTime(s.publishedAt)}
             </li>
           ))}
         </ol>
@@ -118,7 +120,7 @@ function Answer({ result }: { result: AskResult }) {
 
 function PolicyBox({ policy }: { policy: PolicyLink | "loading" }) {
   return (
-    <div className="rounded-md border border-zinc-200 p-3 text-xs dark:border-zinc-700">
+    <div className="rounded-xl border border-white/15 bg-white/5 p-3 text-xs">
       <h3 className={`mb-1 font-semibold ${muted}`}>국정과제 연관성</h3>
       {policy === "loading" ? (
         <p className={muted}>찾는 중입니다…</p>
@@ -145,17 +147,17 @@ export default function AnswerPanel({ state }: { state: AnswerState }) {
     <section
       aria-label="답변"
       aria-live="polite"
-      className="min-h-64 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+      className="glass min-h-64 p-5"
     >
       {state.kind === "idle" ? (
         <p className={`text-sm ${muted}`}>
-          부처를 선택하면 최신 기사가 바로 나옵니다. 질문을 입력하면 수집된 기사만 근거로 답하며,
-          근거가 없으면 &quot;확인된 자료가 없습니다&quot;라고 답합니다.
+          👆 위에서 부처를 고르면 최신 기사가 바로 나와요! 질문을 입력하면 수집된 기사만 근거로 답하고,
+          근거가 없으면 &quot;확인된 자료가 없습니다&quot;라고 답해요.
         </p>
       ) : (
         <div className="space-y-3 text-sm">
           <p className={muted}>
-            선택한 부처: <span className="font-medium">{state.ministry}</span>
+            선택한 부처: <span className="font-bold text-fuchsia-300">{MINISTRY_SHORT[state.ministry as Ministry] ?? state.ministry}</span>
           </p>
           {state.kind === "news-loading" && <p className={muted}>최신 기사를 불러오는 중입니다…</p>}
           {state.kind === "news-error" && <p className={errorBox}>{state.message}</p>}
@@ -173,19 +175,19 @@ export default function AnswerPanel({ state }: { state: AnswerState }) {
           {state.kind === "done" && (
             <>
               {state.result.notices.map((n) => (
-                <p key={n} className="rounded-md bg-amber-50 p-3 text-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                <p key={n} className="rounded-xl bg-amber-400/20 p-3 text-amber-100">
                   {n}
                 </p>
               ))}
               {state.result.status === "ok" ? (
                 <Answer result={state.result} />
               ) : (
-                <p className="rounded-md bg-zinc-100 p-3 dark:bg-zinc-800">{state.result.message}</p>
+                <p className="rounded-xl bg-white/10 p-3">{state.result.message}</p>
               )}
               {state.policy && <PolicyBox policy={state.policy} />}
               {state.result.otherMinistries.length > 0 && (
                 <p className={`text-xs ${muted}`}>
-                  관련 기사 있음: {state.result.otherMinistries.map((o) => `${o.ministry} ${o.count}건`).join(", ")}
+                  관련 기사 있음: {state.result.otherMinistries.map((o) => `${MINISTRY_SHORT[o.ministry as Ministry] ?? o.ministry} ${o.count}건`).join(", ")}
                 </p>
               )}
             </>

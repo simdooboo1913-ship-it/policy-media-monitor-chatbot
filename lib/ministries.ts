@@ -10,3 +10,11 @@ export const MINISTRIES = [
 ] as const;
 
 export type Ministry = (typeof MINISTRIES)[number];
+
+/** 화면·엑셀·PDF에 보여주는 짧은 이름. (내부 처리와 검증에는 위의 정식 이름을 그대로 쓴다) */
+export const MINISTRY_SHORT: Record<Ministry, string> = {
+  과학기술정보통신부: "과기정통부",
+  국토교통부: "국토부",
+  조달청: "조달청",
+  우주항공청: "우주청",
+};

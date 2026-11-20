@@ -111,9 +111,11 @@ export default function ChatScreen() {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 py-6">
       <header className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-xl font-bold">정책·언론 모니터링 &amp; 이슈 브리핑 챗봇</h1>
-        <Link href="/dashboard" className="text-sm text-blue-600 underline">
-          대시보드 (기사 수집·엑셀) →
+        <h1 className="font-display text-2xl sm:text-3xl">
+          <span aria-hidden="true">📰</span> <span className="rainbow-text">정책·언론 모니터링 &amp; 이슈 브리핑</span>
+        </h1>
+        <Link href="/dashboard" className="btn-pop px-4 py-2 text-sm">
+          📊 대시보드 →
         </Link>
       </header>
 
@@ -126,7 +128,7 @@ export default function ChatScreen() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-2">
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs text-violet-200/80">
           개인정보나 비공개 내용은 입력하지 마세요.
         </p>
         <div className="flex gap-2">
@@ -139,14 +141,14 @@ export default function ChatScreen() {
               ministry === null ? "먼저 부처를 선택하세요" : "질문을 입력하세요"
             }
             aria-label="질문 입력"
-            className="min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="field min-w-0 flex-1 px-4 py-2.5 text-sm"
           />
           <button
             type="submit"
             disabled={!canSend}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-zinc-300 dark:disabled:bg-zinc-700"
+            className="btn-pop px-5 py-2.5 text-sm"
           >
-            보내기
+            보내기 ✨
           </button>
         </div>
       </form>

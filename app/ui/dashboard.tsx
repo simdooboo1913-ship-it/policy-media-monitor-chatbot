@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { DashboardArticle, DashboardList } from "@/lib/export/list";
 import type { SheetRow } from "@/lib/export/types";
-import { MINISTRIES } from "@/lib/ministries";
+import { publisherName } from "@/lib/export/publisher";
+import { MINISTRIES, MINISTRY_SHORT } from "@/lib/ministries";
 
 const HEADERS = ["일자", "매체명", "부처", "주요내용", "역점정책과제", "국정과제", "관련 대통령 지시사항", "긍정/부정", "비고(키워드 등)"];
-const inputClass = "w-full rounded border border-zinc-300 bg-white px-1.5 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-900";
-const buttonClass = "rounded-lg px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-zinc-300 dark:disabled:bg-zinc-700";
+const inputClass = "w-full rounded-lg border border-white/20 bg-white/10 px-1.5 py-1 text-xs text-white";
+const buttonClass = "btn-pop px-5 py-2.5 text-sm";
 
 const fmtTime = (iso: string) => {
   const d = new Date(new Date(iso).getTime() + 9 * 3600_000);
@@ -133,24 +134,26 @@ export default function Dashboard() {
     return (
       <div className="mx-auto w-full max-w-[1400px] flex-1 space-y-4 px-4 py-6 print:max-w-none print:p-0">
         <header className="space-y-2 print:hidden">
-          <h1 className="text-xl font-bold">엑셀 양식 검토</h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <h1 className="font-display text-2xl sm:text-3xl">
+          <span aria-hidden="true">📝</span> <span className="rainbow-text">엑셀 양식 검토</span>
+        </h1>
+          <p className="text-sm text-violet-100/80">
             칸을 눌러 고칠 수 있습니다. <b>국정과제</b>는 국정과제 PDF에서 근거가 확인된 것만 넣었고, <b>역점정책과제·대통령 지시사항</b>은 자료가 없어 비워 두었습니다.
             <b> 긍정/부정</b>은 기사 논조에 대한 AI 제안이니 확인해 주세요.
           </p>
           <div className="flex flex-wrap gap-2">
-            <button onClick={() => setRows(null)} className="rounded-lg border border-zinc-300 px-4 py-2 text-sm dark:border-zinc-700">
+            <button onClick={() => setRows(null)} className="rounded-full border border-white/25 bg-white/10 px-5 py-2.5 text-sm font-bold hover:bg-white/20">
               ← 기사 다시 고르기
             </button>
-            <button onClick={downloadXlsx} disabled={busy !== null} className={`${buttonClass} bg-green-700`}>
-              엑셀 내려받기
+            <button onClick={downloadXlsx} disabled={busy !== null} className={`${buttonClass} btn-green`}>
+              📗 엑셀 내려받기
             </button>
-            <button onClick={() => window.print()} className={`${buttonClass} bg-blue-600`}>
-              PDF로 저장
+            <button onClick={() => window.print()} className={buttonClass}>
+              📄 PDF로 저장
             </button>
           </div>
           {message && (
-            <p role="status" className="text-sm text-red-600">
+            <p role="status" className="text-sm text-rose-300">
               {message}
             </p>
           )}
@@ -162,7 +165,7 @@ export default function Dashboard() {
             <thead>
               <tr>
                 {HEADERS.map((h) => (
-                  <th key={h} className="border border-zinc-300 bg-zinc-100 px-2 py-1.5 font-semibold dark:border-zinc-700 dark:bg-zinc-800">
+                  <th key={h} className="border border-white/20 bg-white/15 px-2 py-1.5 font-semibold">
                     {h}
                   </th>
                 ))}
@@ -171,38 +174,38 @@ export default function Dashboard() {
             <tbody>
               {ordered.map(({ r, i }) => (
                 <tr key={i} className="align-top">
-                  <td className="w-16 border border-zinc-300 p-1 dark:border-zinc-700">
+                  <td className="w-16 border border-white/15 p-1">
                     <input className={inputClass} aria-label="일자" value={r.date} onChange={(e) => updateRow(i, { date: e.target.value })} />
                   </td>
-                  <td className="w-24 border border-zinc-300 p-1 dark:border-zinc-700">
+                  <td className="w-24 border border-white/15 p-1">
                     <input className={inputClass} aria-label="매체명" value={r.publisher} onChange={(e) => updateRow(i, { publisher: e.target.value })} />
                   </td>
-                  <td className="w-24 border border-zinc-300 p-1 text-center dark:border-zinc-700">{r.ministry}</td>
-                  <td className="min-w-64 border border-zinc-300 p-1 dark:border-zinc-700">
+                  <td className="w-24 border border-white/15 p-1 text-center">{MINISTRY_SHORT[r.ministry]}</td>
+                  <td className="min-w-64 border border-white/15 p-1">
                     <textarea className={inputClass} aria-label="주요내용" rows={3} value={r.content} onChange={(e) => updateRow(i, { content: e.target.value })} />
                     {r.url && (
-                      <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                      <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-cyan-300 underline">
                         원문 보기
                       </a>
                     )}
                   </td>
-                  <td className="w-28 border border-zinc-300 p-1 dark:border-zinc-700">
+                  <td className="w-28 border border-white/15 p-1">
                     <textarea className={inputClass} aria-label="역점정책과제" rows={3} value={r.priorityPolicy} onChange={(e) => updateRow(i, { priorityPolicy: e.target.value })} />
                   </td>
-                  <td className="min-w-44 border border-zinc-300 p-1 dark:border-zinc-700">
+                  <td className="min-w-44 border border-white/15 p-1">
                     <textarea className={inputClass} aria-label="국정과제" rows={3} value={r.agenda} onChange={(e) => updateRow(i, { agenda: e.target.value })} />
                   </td>
-                  <td className="w-32 border border-zinc-300 p-1 dark:border-zinc-700">
+                  <td className="w-32 border border-white/15 p-1">
                     <textarea className={inputClass} aria-label="관련 대통령 지시사항" rows={3} value={r.directive} onChange={(e) => updateRow(i, { directive: e.target.value })} />
                   </td>
-                  <td className="w-20 border border-zinc-300 p-1 dark:border-zinc-700">
+                  <td className="w-20 border border-white/15 p-1">
                     <select className={inputClass} aria-label="긍정/부정" value={r.tone} onChange={(e) => updateRow(i, { tone: e.target.value as SheetRow["tone"] })}>
                       <option value="">(없음)</option>
                       <option value="긍정">긍정</option>
                       <option value="부정">부정</option>
                     </select>
                   </td>
-                  <td className="w-32 border border-zinc-300 p-1 dark:border-zinc-700">
+                  <td className="w-32 border border-white/15 p-1">
                     <textarea className={inputClass} aria-label="비고" rows={3} value={r.note} onChange={(e) => updateRow(i, { note: e.target.value })} />
                   </td>
                 </tr>
@@ -215,7 +218,7 @@ export default function Dashboard() {
         <div className="hidden print:block">
           {MINISTRIES.filter((m) => rows.some((r) => r.ministry === m)).map((m) => (
             <section key={m} className="mb-6 break-after-page last:mb-0 last:break-after-auto">
-              <h2 className="mb-2 text-base font-bold">{m} 언론 &amp; 정책 동향</h2>
+              <h2 className="mb-2 text-base font-bold">{MINISTRY_SHORT[m]} 언론 &amp; 정책 동향</h2>
               <table className="w-full border-collapse text-[10px]">
                 <thead>
                   <tr>
@@ -233,7 +236,7 @@ export default function Dashboard() {
                       <tr key={i} className="break-inside-avoid align-top">
                         <td className="border border-black px-1 py-0.5 text-center">{r.date}</td>
                         <td className="border border-black px-1 py-0.5">{r.publisher}</td>
-                        <td className="border border-black px-1 py-0.5">{r.ministry}</td>
+                        <td className="border border-black px-1 py-0.5">{MINISTRY_SHORT[r.ministry]}</td>
                         <td className="border border-black px-1 py-0.5">
                           {r.url ? (
                             <a href={r.url} className="underline">
@@ -264,17 +267,19 @@ export default function Dashboard() {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 px-4 py-6">
       <header className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-xl font-bold">대시보드</h1>
-        <Link href="/" className="text-sm text-blue-600 underline">
+        <h1 className="font-display text-2xl sm:text-3xl">
+          <span aria-hidden="true">📊</span> <span className="rainbow-text">대시보드</span>
+        </h1>
+        <Link href="/" className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-bold hover:bg-white/20">
           ← 질의응답 화면
         </Link>
       </header>
 
       <div className="flex flex-wrap items-center gap-3">
-        <button onClick={collect} disabled={busy !== null} className={`${buttonClass} bg-blue-600`}>
-          {busy === "collect" ? "수집 중…" : "기사 수집"}
+        <button onClick={collect} disabled={busy !== null} className={buttonClass}>
+          {busy === "collect" ? "수집 중… ⏳" : "📥 기사 수집"}
         </button>
-        <span role="status" className="text-sm text-zinc-600 dark:text-zinc-400">
+        <span role="status" className="text-sm text-violet-100/80">
           {message || (busy === "load" ? "불러오는 중…" : `전날 0시 이후 기사 ${total}건 (같은 내용은 한 건으로 묶음)`)}
         </span>
       </div>
@@ -284,30 +289,30 @@ export default function Dashboard() {
           const list = articles[m];
           const allOn = list.length > 0 && list.every((a) => checked.has(a.id));
           return (
-            <section key={m} className="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
+            <section key={m} className="glass p-4">
               <div className="mb-2 flex items-center justify-between">
                 <h2 className="font-semibold">
-                  {m} <span className="text-sm font-normal text-zinc-500">({list.length}건)</span>
+                  {MINISTRY_SHORT[m]} <span className="text-sm font-normal text-violet-200/70">({list.length}건)</span>
                 </h2>
                 {list.length > 0 && (
-                  <label className="flex items-center gap-1 text-xs text-zinc-600 dark:text-zinc-400">
+                  <label className="flex items-center gap-1 text-xs text-violet-100/80">
                     <input type="checkbox" checked={allOn} onChange={() => toggleMinistry(list)} /> 전체 선택
                   </label>
                 )}
               </div>
               {list.length === 0 ? (
-                <p className="text-sm text-zinc-500">수집된 기사가 없습니다.</p>
+                <p className="text-sm text-violet-200/70">수집된 기사가 없습니다.</p>
               ) : (
-                <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                <ul className="divide-y divide-white/10">
                   {list.map((a) => (
                     <li key={a.id} className="flex items-start gap-2 py-2">
                       <input type="checkbox" className="mt-1" aria-label={`${a.title} 선택`} checked={checked.has(a.id)} onChange={() => toggle(a.id)} />
                       <div className="min-w-0 text-sm">
-                        <a href={a.url} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-700 hover:underline dark:text-blue-400">
+                        <a href={a.url} target="_blank" rel="noopener noreferrer" className="font-medium text-cyan-300 hover:underline">
                           {a.title}
                         </a>
-                        <p className="text-xs text-zinc-500">
-                          {a.publisher} · {fmtTime(a.publishedAt)}
+                        <p className="text-xs text-violet-200/70">
+                          {publisherName(a.publisher)} · {fmtTime(a.publishedAt)}
                           {a.edition ? ` · ${a.edition}` : ""}
                           {a.duplicateCount > 1 ? ` · 같은 내용 ${a.duplicateCount}건` : ""}
                         </p>
@@ -320,10 +325,10 @@ export default function Dashboard() {
           );
         })}
 
-      <div className="sticky bottom-0 flex items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white/95 p-3 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95">
+      <div className="sticky bottom-0 flex items-center justify-between gap-2 glass p-3">
         <span className="text-sm">{checked.size}건 선택</span>
-        <button onClick={sendToExcel} disabled={checked.size === 0 || busy !== null} className={`${buttonClass} bg-green-700`}>
-          {busy === "classify" ? "분류 중…" : "엑셀로 보내기"}
+        <button onClick={sendToExcel} disabled={checked.size === 0 || busy !== null} className={`${buttonClass} btn-green`}>
+          {busy === "classify" ? "분류 중… ⏳" : "📤 엑셀로 보내기"}
         </button>
       </div>
     </div>

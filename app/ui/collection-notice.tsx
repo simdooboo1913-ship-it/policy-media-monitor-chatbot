@@ -24,7 +24,7 @@ export default function CollectionNoticeBanner() {
   return (
     <div
       role="status"
-      className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100"
+      className="rounded-2xl border border-amber-300/40 bg-amber-400/15 px-4 py-2 text-sm text-amber-100"
     >
       <p className="font-medium">⚠ {notice.heading}</p>
       <ul className="mt-1 list-disc pl-5">

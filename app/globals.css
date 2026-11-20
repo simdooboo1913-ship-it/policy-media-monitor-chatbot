@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
+/* 화면은 항상 어두운 네온 테마로 보여 준다. (html 에 dark 클래스를 붙여 기존 dark: 스타일을 모두 켠다) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #120b2e;
+  --foreground: #f3efff;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -10,23 +14,99 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: var(--font-jua), "Malgun Gothic", sans-serif;
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  /* 보라·분홍·청록이 번지는 배경 */
+  background:
+    radial-gradient(900px 500px at 8% -5%, rgba(168, 85, 247, 0.35), transparent 60%),
+    radial-gradient(700px 500px at 100% 10%, rgba(236, 72, 153, 0.28), transparent 60%),
+    radial-gradient(800px 600px at 50% 110%, rgba(34, 211, 238, 0.22), transparent 60%),
+    var(--background);
+  background-attachment: fixed;
 }
 
-/* PDF로 저장(인쇄) 할 때 엑셀 양식처럼 A4 가로로 나오게 한다 */
+/* 제목용 둥근 글꼴과 무지개 글자 */
+.font-display {
+  font-family: var(--font-display);
+}
+.rainbow-text {
+  background: linear-gradient(90deg, #f0abfc, #a5b4fc, #67e8f9, #86efac);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* 유리 느낌의 카드 */
+.glass {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* 눌러 보고 싶은 버튼: 통통 튀는 느낌 */
+.btn-pop {
+  border-radius: 9999px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #ec4899, #8b5cf6 55%, #06b6d4);
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.btn-pop:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.1);
+}
+.btn-pop:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.btn-pop:disabled {
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.45);
+}
+.btn-green {
+  background: linear-gradient(135deg, #22c55e, #14b8a6);
+  box-shadow: 0 6px 18px rgba(20, 184, 166, 0.4);
+}
+
+/* 글자 입력칸 */
+.field {
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.field::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+.field:focus {
+  outline: 2px solid #c084fc;
+  outline-offset: 1px;
+}
+
+/* 움직임을 줄이고 싶은 사람은 애니메이션을 끈다 */
+@media (prefers-reduced-motion: reduce) {
+  .btn-pop {
+    transition: none;
+  }
+}
+
+/* PDF로 저장(인쇄) 할 때는 엑셀 양식처럼 흰 바탕·검은 글씨, A4 가로로 나오게 한다 */
 @page {
   size: A4 landscape;
   margin: 8mm;
+}
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
 }

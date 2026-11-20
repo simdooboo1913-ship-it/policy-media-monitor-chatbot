@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Do_Hyeon } from "next/font/google";
 import "./globals.css";
+
+// 제목에 쓰는 둥글둥글한 글꼴
+const jua = Do_Hyeon({
+  variable: "--font-jua",
+  weight: "400",
+  preload: false, // 한글 글자 조각은 필요할 때 내려받는다
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${jua.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

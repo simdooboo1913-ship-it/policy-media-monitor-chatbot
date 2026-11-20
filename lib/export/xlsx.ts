@@ -1,7 +1,7 @@
 // 분류한 행을 엑셀 양식(templates/media-policy-form.xlsx)에 채워 .xlsx 로 만든다. 부처마다 시트 하나.
 import path from "node:path";
 import ExcelJS from "exceljs";
-import { MINISTRIES, type Ministry } from "../ministries";
+import { MINISTRIES, MINISTRY_SHORT, type Ministry } from "../ministries";
 import { MAX_CELL_LENGTH, MAX_EXPORT_ROWS, type SheetRow } from "./types";
 
 const TEMPLATE_PATH = path.join(process.cwd(), "templates", "media-policy-form.xlsx");
@@ -60,8 +60,8 @@ function fillSheet(ws: ExcelJS.Worksheet, ministry: Ministry, rows: SheetRow[]) 
   const middle = styleOf(MIDDLE_ROW);
   const last = styleOf(LAST_ROW);
 
-  ws.name = ministry;
-  ws.getCell("A1").value = `${ministry} 언론 & 정책 동향`;
+  ws.name = MINISTRY_SHORT[ministry];
+  ws.getCell("A1").value = `${MINISTRY_SHORT[ministry]} 언론 & 정책 동향`;
   // 양식에 들어 있던 예시 글자와 빈 표 칸을 모두 비운다.
   for (let r = FIRST_ROW; r <= LAST_ROW; r++) {
     for (let c = 1; c <= COLUMNS; c++) {
@@ -76,7 +76,7 @@ function fillSheet(ws: ExcelJS.Worksheet, ministry: Ministry, rows: SheetRow[]) 
     const values: (string | ExcelJS.CellHyperlinkValue)[] = [
       row.date,
       row.publisher,
-      row.ministry,
+      MINISTRY_SHORT[row.ministry],
       row.url ? { text: row.content, hyperlink: row.url } : row.content,
       row.priorityPolicy,
       row.agenda,
@@ -105,7 +105,7 @@ export async function buildWorkbook(rows: SheetRow[]): Promise<Buffer> {
   // 첫 부처 외에는 양식 모양을 복사해 새 시트를 만든다. (복사본은 양식이 비워지기 전에 만든다)
   const sheets = ministries.map((m, i) => {
     if (i === 0) return template;
-    const ws = wb.addWorksheet(`${m}`);
+    const ws = wb.addWorksheet(MINISTRY_SHORT[m]);
     copySheet(template, ws);
     return ws;
   });
