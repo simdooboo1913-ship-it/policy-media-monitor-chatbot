@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 정책·언론 모니터링 & 이슈 브리핑 챗봇
 
-## Getting Started
+부처 담당 평가관이 매일 약 2시간씩 하던 **정책·언론 동향 검색**을 줄이기 위한 웹 서비스입니다.
+언론사 RSS 기사와 대통령 국정과제 PDF를 근거로, **출처 없는 말은 하지 않는 질의응답 챗봇**과 **매일 아침 요약 메일**을 제공합니다.
 
-First, run the development server:
+- 사용자: 부처 담당 평가관 1명 (접속 비밀번호로 보호)
+- 대상 부처: 과학기술정보통신부, 국토교통부, 조달청, 우주항공청
+- 기획 문서: [PRD.md](PRD.md) (기획서) · [PLAN.md](PLAN.md) (계획서) · [DESIGN.md](DESIGN.md) (설계) · [CHECK.md](CHECK.md) (검증 결과)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 주요 기능
+
+| 기능 | 설명 |
+|---|---|
+| 출처 기반 질의응답 | 부처를 고르고 질문하면 수집된 기사만 근거로 요약합니다. 모든 문장에 출처 번호와 링크가 붙고, 근거가 없으면 "확인된 자료가 없습니다"라고 답합니다. 조간·석간 구분, 국정과제 번호·과제명·근거 문구를 함께 보여 줍니다. |
+| 매일 아침 요약 메일 | 전날 0시~당일 오전 8시 기사를 부처별 최대 10개로 정리해 메일로 보냅니다. 당일 조간·전날 석간 구분, 국정과제 번호, 출처 링크를 포함합니다. (Vercel Cron, 한국 시간 매일 오전 8시 실행) |
+| 대시보드 → 엑셀 → PDF | 기사 수집 버튼으로 기사를 모으고, 체크한 기사를 엑셀 양식(일자·매체명·부처·주요내용·국정과제·긍정/부정·비고)에 맞춰 분류합니다. 검토·수정 후 엑셀로 내려받거나 PDF로 저장합니다. |
+| 접속 비밀번호 | 비밀번호를 5회 연속 틀리면 10분간 접속을 막습니다. |
+
+## 환각(근거 없는 답변)을 막는 방법
+
+- AI는 "문장 + 기사 번호"만 만들고, **링크는 서버가 번호로 붙입니다.**
+- 서버가 문장마다 검사합니다: 없는 기사 번호, 기사에 없는 숫자, 평가·전망·진위 표현, 기사 문장 길게 옮기기, 출처마다 수치가 다른데 한 문장으로 합친 경우를 걸러 냅니다.
+- 국정과제 연관성은 국정과제 PDF에서 **글자 그대로 인용한 근거 문구**가 실제로 있을 때만 표시합니다. 확인이 안 되면 "일치하는 국정과제를 확인하지 못했습니다".
+- 수집 대상이 아닌 채널(유튜브·SNS 등)은 "현재 수집 대상이 아닙니다"라고 안내합니다.
+- 질문·답변 기록은 저장하지 않습니다.
+
+## 사용 기술
+
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Supabase (Postgres) · OpenAI API · Resend (메일) · exceljs (엑셀) · Vercel (배포, Cron)
+
+## 폴더 구조
+
+```
+app/        화면(질의응답 /, 대시보드 /dashboard, 접속 /login)과 API
+lib/        수집·정리·답변 검사·요약·메일·자동 실행 로직
+scripts/    수집, 점검(answers:check), 요약 미리보기·발송 등 보조 도구
+supabase/   보관함(DB) 구조 변경 파일
+templates/  엑셀 양식
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 직접 실행해 보기
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. 필요한 값을 `.env` 파일에 적습니다. 이름은 [.env.example](.env.example)을 보세요. (`.env`는 깃허브에 올라가지 않습니다)
+2. 아래 명령을 실행하고 http://localhost:3000 을 엽니다.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+보조 명령: `npm run lint` · `npm run answers:check` (환각 점검 10개) · `npm run digest:send` (아침 요약 즉시 발송)
 
-To learn more about Next.js, take a look at the following resources:
+## 알려진 한계
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Google 뉴스 기사는 요약문이 없고 링크가 Google 연결 주소입니다.
+- 제목이 다른 같은 사건은 한 묶음으로 묶이지 않을 수 있습니다.
+- 자동 수집은 하루 1번입니다. (대시보드의 수집 버튼으로 직접 가져올 수 있습니다)
+- 조간·석간은 발행 시각(12시, 18시)으로 나눈 임시 기준입니다.
+- 상충 출처 검사는 숫자가 다른 경우만 잡습니다.
+- 질문이 외부 AI 서비스를 거치므로 개인정보·비공개 내용은 입력하지 않아야 합니다.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+자세한 검증 결과와 남은 항목은 [CHECK.md](CHECK.md)를 참고하세요.
